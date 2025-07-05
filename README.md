@@ -13,6 +13,7 @@
 
 ### 1. Cloner le dépôt
 git clone https://github.com/JonathandryRandrianaly/shopifyTest.git
+
 cd shopifyTest
 
 ### 2. Installer les dépendances Symfony (dans backend/):
@@ -38,3 +39,6 @@ Importer le fichier importAchat.xlsx
 
 ## Exemple de cron job
 0 0 * * * /usr/bin/curl -X PUT http://localhost:8000/api/product/updateShopifyPrice > /dev/null 2>&1
+
+## note:
+shopify_api_url et toute autre configuration Symfony ont été implémentées dans le fichier .env.
