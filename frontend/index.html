@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rapport Produits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Rapport des Produits</h1>
+        <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mb-4">
+        <!-- Bouton Import -->
+        <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto">
+            Importer
+        </button>
+
+        <!-- Bouton Export -->
+        <button id="exportBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full sm:w-auto">
+            Exporter Excel
+        </button>
+        <button id="updatePricesBtn" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 w-full sm:w-auto">
+            Mettre à jour les prix
+        </button>
+        </div>
+      <br>
+    <div class="overflow-x-auto rounded-lg shadow-lg bg-white">
+      <table class="min-w-full divide-y divide-gray-200" id="rapportTable">
+        <thead class="bg-gray-50 text-gray-700 uppercase text-sm">
+          <tr>
+            <th class="px-4 py-3 text-left">Référence Produit</th>
+            <th class="px-4 py-3 text-left">Fournisseur</th>
+            <th class="px-4 py-3 text-right">Quantité</th>
+            <th class="px-4 py-3 text-right">Prix Achat</th>
+            <th class="px-4 py-3 text-right">Prix Shopify</th>
+            <th class="px-4 py-3 text-right">Marge</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-sm" id="rapportBody">
+          <tr><td colspan="6" class="text-center py-6">Chargement des données...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+<!-- Modal -->
+<div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Importer un fichier</h2>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-red-500">&times;</button>
+      </div>
+    <form id="importForm" enctype="multipart/form-data" class="text-center">
+  <label for="fileInput" class="border-2 border-dashed border-gray-300 p-6 w-full max-w-xs mx-auto cursor-pointer hover:bg-gray-100 block relative">
+    <p class="text-gray-500 mb-2">Cliquez pour choisir un fichier (.xlsx ou .xls)</p>
+    <input type="file" name="file" id="fileInput" accept=".xlsx,.xls" class="hidden" />
+  </label>
+  <p id="fileName" class="mt-2 text-sm text-gray-700 italic"></p>
+  <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full max-w-xs mx-auto block" disabled>
+    Importer
+  </button>
+</form>
+  </div>
+</div>
+  <script>
+
+    async function loadRapport() {
+      const tbody = document.getElementById('rapportBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6">Chargement des données...</td></tr>';
+
+      try {
+        const response = await fetch('http://localhost:8000/api/product/rapports');
+        const json = await response.json();
+
+        if (json.status !== 'success') {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-red-600">Erreur chargement des données</td></tr>';
+          return;
+        }
+
+        const data = json.data;
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6">Aucune donnée disponible</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        const formatter = new Intl.NumberFormat('fr-FR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        });
+
+        data.forEach(item => {
+        tbody.innerHTML += `
+            <tr>
+            <td class="px-4 py-2">${item.reference ?? ''}</td>
+            <td class="px-4 py-2">${item.supplier ?? ''}</td>
+            <td class="px-4 py-2 text-right">${(item.quantity ?? 0).toLocaleString('fr-FR')}</td>
+            <td class="px-4 py-2 text-right">${formatter.format(Number(item.purchasePrice))}</td>
+            <td class="px-4 py-2 text-right">${formatter.format(Number(item.shopifyPrice))}</td>
+            <td class="px-4 py-2 text-right text-green-600 font-semibold">${formatter.format(Number(item.margin))}</td>
+            </tr>`;
+        });
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-red-600">Erreur réseau ou serveur</td></tr>';
+        console.error(e);
+      }
+    }
+
+    window.onload = loadRapport;
+    function openModal() {
+      document.getElementById('importModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('importModal').classList.add('hidden');
+    }
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const submitBtn = document.querySelector('#importForm button[type="submit"]');
+
+    fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        fileNameDisplay.textContent = `Fichier sélectionné : ${fileInput.files[0].name}`;
+        submitBtn.disabled = false;
+    } else {
+        fileNameDisplay.textContent = '';
+        submitBtn.disabled = true;
+    }
+    });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    fetch('http://localhost:8000/api/purchase/export', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Erreur lors de l\'export');
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'RapportShopify.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(err => alert(err.message));
+  });
+
+  const form = document.getElementById('importForm');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput.files.length === 0) {
+    alert('Veuillez sélectionner un fichier.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+
+  fetch('http://localhost:8000/api/purchase/import', {
+    method: 'POST',
+    body: formData,
+  })
+  .then(response => response.json())
+  .then(data => {
+
+  console.log('Réponse API :', data);
+    if (data.status === 'success') {
+      closeModal();
+      window.location.reload();
+    } else {
+      alert('Erreur lors de l\'import.');
+    }
+  })
+  .catch(error => {
+    alert('Erreur réseau ou serveur : ' + error.message);
+  });
+});
+document.getElementById('updatePricesBtn').addEventListener('click', () => {
+  if (!confirm('Voulez-vous vraiment mettre à jour les prix Shopify ?')) {
+    return;
+  }
+
+  fetch('http://localhost:8000/api/product/updateShopifyPrice', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour des prix');
+    return response.json().catch(() => ({}));
+  })
+  .then(() => {
+    window.location.reload();
+  })
+  .catch(err => alert(err.message));
+});
+</script>
+</body>
+</html>
+
