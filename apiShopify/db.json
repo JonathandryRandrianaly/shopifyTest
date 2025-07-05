@@ -1,0 +1,10 @@
+{
+  "shopify-prices": [
+    { "refProduit": "ref001", "prixVente": 15000 },
+    { "refProduit": "ref002", "prixVente": 20000 },
+    { "refProduit": "ref003", "prixVente": 2500000 },
+    { "refProduit": "ref004", "prixVente": 2000000 },
+    { "refProduit": "ref005", "prixVente": 30000 },
+    { "refProduit": "ref006", "prixVente": 450000 }
+  ]
+}
