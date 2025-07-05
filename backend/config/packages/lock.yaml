@@ -1,0 +1,6 @@
+framework:
+    # lock: '%env(LOCK_DSN)%'
+    lock:
+        enabled: true
+        stores:
+            app: 'doctrine'

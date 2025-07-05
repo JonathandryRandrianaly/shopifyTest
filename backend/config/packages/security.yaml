@@ -1,0 +1,104 @@
+security:
+    encoders:
+        App\Entity\Usr:
+            algorithm: auto
+
+    # https://symfony.com/doc/current/security/experimental_authenticators.html
+    enable_authenticator_manager: true
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\Usr
+                property: username
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        login:
+            pattern: ^/api/login
+            stateless: true
+            #anonymous: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            #custom_authenticator: App\Security\AppCustomAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
+                
+        #default:
+            #anonymous: true
+            #lazy: true
+            #guard:
+                #authenticators:
+                    #- App\Security\AppCustomAuthenticator
+            #logout:
+                #path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
+
+        api:
+            pattern: ^/api
+            stateless: true
+            #anonymous: true
+            provider: app_user_provider
+            guard:
+                #entry_point: App\Security\AppCustomAuthenticator
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+                    #- App\Security\AppCustomAuthenticator
+                
+
+        main:
+            #anonymous: true
+            json_login:
+                check_path: /authentication_token
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+        
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api/token/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login_check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: ^/api/adidy.*, roles: [ROLE_MPANDRAY,ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER] }
+        # - { path: ^/api/billet.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR] }
+        # - { path: ^/api/budget.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE] }
+        # - { path: ^/api/sms.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR] }
+        # - { path: ^/api/asa_pastoraly.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_SECRETAIRE] }
+        # - { path: ^/api/mariage.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_SECRETAIRE] }
+        # - { path: ^/api/mouvement_financier.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        # - { path: ^/api/rakitra.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        # - { path: ^/api/mpivavaka.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        # - { path: ^/api/sampana_mpivavaka.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        # - { path: ^/api/groupe.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        # - { path: ^/api/classe.*, roles: [ROLE_SUPER_ADMIN,ROLE_ADMIN,ROLE_PASTEUR,ROLE_TRESORIER,ROLE_SECRETAIRE_FINANCE,ROLE_MPANDRAY,ROLE_DIAKONA] }
+        
+        # - { path: ^/api/credocs.*, roles: ROLE_CREDOC_CAN_INSERT, methods: [POST] }
+        # - { path: ^/api/credocs.*, roles: ROLE_CREDOC_CAN_UPDATE, methods: [PUT, PATCH] }
+        # - { path: ^/api/credocs.*, roles: ROLE_CREDOC_CAN_DELETE, methods: [DELETE] }
+        # - { path: ^/api/usrs.*, roles: ROLE_ADMIN, methods: [PUT, PATCH] }
+        
+        # - { path: ^/api/usr, roles: ROLE_USER }
+        # - { path: ^/api, roles: ROLE_USER }
+        # - { path: ^/admin, roles:  IS_AUTHENTICATED_ANONYMOUSLY }
+        
+        # - { path: ^/authentication_token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: ^/profile, roles: ROLE_ADMIN }
+        # - { path: '^/api', roles: IS_AUTHENTICATED_ANONYMOUSLY, ips: [127.0.0.1] }
+        # - { path: ^/api/login, roles: IS_AUTHENTICATED_FULLY }
+        # - { path: '^/api', roles: ROLE_USER, ips: [127.0.0.1] }

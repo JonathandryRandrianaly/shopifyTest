@@ -1,0 +1,20 @@
+framework:
+    messenger:
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        # failure_transport: failed
+        transports:
+            #async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            # default configuration
+            #retry_strategy:
+            #    max_retries: 1
+            
+            async: 
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 0
+                    delay: 5000
+                    
+        routing:
+            App\Message\EtatMessage: async        
+            # App\Message\ImportDbaseMessage: async
+            # App\Message\GenerateEtatAuto: async

@@ -1,0 +1,11 @@
+scheduler_bundle:
+    transport:
+        dsn: 'filesystem://first_in_first_out'
+    tasks:
+        foo:
+            type: 'command'
+            command: 'cache:clear'
+            expression: '0 7 * * *'
+            description: 'A simple cache clear task'
+            options:
+                env: test

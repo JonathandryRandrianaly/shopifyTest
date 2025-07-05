@@ -1,0 +1,24 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "timeout": 10,
+    "phpUnit": {
+        "configDir": "."
+    },
+    "logs": {
+        "badge": {
+            "branch": "main"
+        },
+        "text": "infection.log",
+        "summary": "summary.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "testFramework": "phpunit",
+    "minCoveredMsi": 92,
+    "minMsi": 88
+}

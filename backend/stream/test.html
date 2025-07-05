@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<h1>SSE demo with PHP</h1>
+
+<ol id="list">
+</ol>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+            // Create new event, the server script is sse.php
+            console.log("start SSE =====>")
+            var eventSource = new EventSource("http://localhost:8001/index.php");
+
+            // Event when receiving a message from the server
+            eventSource.addEventListener("message", function(event){
+                console.log("start MSG =====>"+event.data );
+                // Append the message to the ordered list
+                document.getElementById("list").innerHTML += '<li>'+event.data + "</li>";
+            });/*
+            eventSource.onmessage = function(event) {
+
+                console.log("start MSG =====>")
+                // Append the message to the ordered list
+                document.getElementById("list").innerHTML += '<li>'+event.data + "</li>";
+            };*/
+        });
+</script>
+</body>
+</html>

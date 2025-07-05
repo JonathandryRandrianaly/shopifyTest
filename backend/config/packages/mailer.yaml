@@ -1,0 +1,11 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+
+swiftmailer:
+    url: '%env(MAILER_URL)%'
+    #stream_options:
+        #ssl:
+            #allow_self_signed: false
+            #verify_peer: false
+            #verify_peer_name: false

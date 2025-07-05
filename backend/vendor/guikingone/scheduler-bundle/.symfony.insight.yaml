@@ -1,0 +1,13 @@
+php_version: 7.4
+
+global_exclude_dirs:
+  - .github
+  - assets
+  - doc
+
+commit_failure_conditions:
+  - "project.grade < platinum"
+
+rules:
+  php.use_php_sleep_function:
+    enabled: false
